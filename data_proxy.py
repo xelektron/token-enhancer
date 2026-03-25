@@ -13,6 +13,7 @@ from dataclasses import dataclass
 
 import requests as http_requests
 from bs4 import BeautifulSoup
+from url_validator import validate_url, URLValidationError
 
 
 DB_PATH = "agent_proxy.db"
@@ -210,6 +211,19 @@ def estimate_tokens(text: str) -> int:
 
 def fetch_and_clean(url: str, ttl: int = 300) -> DataResult:
     """Fetch a URL, clean it, cache it, return clean content."""
+
+    # Validate URL before doing anything (SSRF protection)
+    try:
+        validate_url(url)
+    except URLValidationError as e:
+        error = str(e)
+        log_fetch(url, 0, 0, from_cache=False, error=error)
+        return DataResult(
+            url=url, original_size=0, cleaned_size=0,
+            original_tokens=0, cleaned_tokens=0,
+            from_cache=False, content="", content_type="error",
+            error=error
+        )
 
     # Check cache first
     cached = cache_get(url)

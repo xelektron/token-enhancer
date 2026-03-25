@@ -14,6 +14,7 @@ import uuid
 from flask import Flask, request, jsonify
 from optimizer import optimize_prompt
 from data_proxy import fetch_and_clean, init_data_db
+from url_validator import validate_batch, URLValidationError
 
 app = Flask(__name__)
 
@@ -163,6 +164,11 @@ def fetch_batch():
     if not urls:
         return jsonify({"error": "Send {\"urls\": [\"https://...\", ...]}"}), 400
 
+    try:
+        validate_batch(urls)
+    except URLValidationError as e:
+        return jsonify({"error": str(e)}), 400
+
     results = []
     total_original = 0
     total_cleaned = 0
@@ -233,4 +239,4 @@ if __name__ == "__main__":
     print(f"  Running: http://localhost:{PROXY_PORT}")
     print(f"  Stats:   http://localhost:{PROXY_PORT}/stats")
     print("=" * 52 + "\n")
-    app.run(host="0.0.0.0", port=PROXY_PORT, debug=False)
+    app.run(host="127.0.0.1", port=PROXY_PORT, debug=False)
