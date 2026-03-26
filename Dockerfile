@@ -7,10 +7,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-COPY requirements.txt ./requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
 
-COPY proxy.py data_proxy.py mcp_server.py optimizer.py test_all.py ./
+RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 8080
 
