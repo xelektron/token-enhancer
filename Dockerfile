@@ -1,23 +1,17 @@
 # syntax=docker/dockerfile:1
 
-ARG VERSION
+FROM python:3.12-slim
 
-FROM docker.io/library/python:3.12-slim
-
-RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Clone upstream repo (strip 'v' prefix if present)
-RUN git clone --depth 1 --branch ${VERSION#v} https://github.com/Boof-Pack/token-enhancer.git /src
-
-WORKDIR /src
-
-# Install dependencies
+COPY requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose port
+COPY proxy.py data_proxy.py mcp_server.py optimizer.py test_all.py ./
+
 EXPOSE 8080
 
-# Run the proxy server
-CMD ["python3", "proxy.py"]
+CMD ["python", "proxy.py"]
