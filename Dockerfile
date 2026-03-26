@@ -8,8 +8,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /
 
 WORKDIR /app
 
-# Clone upstream repo
-RUN git clone --depth 1 --branch ${VERSION} https://github.com/Boof-Pack/token-enhancer.git /src
+# Clone upstream repo (strip 'v' prefix if present)
+RUN git clone --depth 1 --branch ${VERSION#v} https://github.com/Boof-Pack/token-enhancer.git /src
 
 WORKDIR /src
 
