@@ -72,11 +72,16 @@ Windows: `%APPDATA%\Claude\claude_desktop_config.json`
   "mcpServers": {
     "token-enhancer": {
       "command": "python3",
-      "args": ["-m", "mcp_server"]
+      "args": ["-m", "mcp_server"],
+      "env": {
+        "REQUESTS_CA_BUNDLE": "/etc/ssl/certs/ca-certificates.crt"
+      }
     }
   }
 }
 ```
+
+> On Linux hosts where SSL verification fails, the `env` block above overrides the default CA bundle. Remove it on macOS/Windows.
 
 **Cursor:** Add to `.cursor/mcp.json` in your project:
 ```json

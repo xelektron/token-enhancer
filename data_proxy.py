@@ -4,6 +4,7 @@ Fetches URLs, strips HTML noise, caches results.
 Returns clean text instead of raw HTML.
 """
 
+import os
 import re
 import json
 import time
@@ -247,7 +248,12 @@ def fetch_and_clean(url: str, ttl: int = 300) -> DataResult:
         headers = {
             "User-Agent": "Mozilla/5.0 (compatible; AgentCostProxy/0.1)"
         }
-        resp = http_requests.get(url, headers=headers, timeout=30)
+        _SYSTEM_CA = "/etc/ssl/certs/ca-certificates.crt"
+        CA_BUNDLE = (
+            os.environ.get("REQUESTS_CA_BUNDLE") or
+            (_SYSTEM_CA if os.path.exists(_SYSTEM_CA) else True)
+        )
+        resp = http_requests.get(url, headers=headers, timeout=30, verify=CA_BUNDLE)
         resp.raise_for_status()
     except http_requests.RequestException as e:
         error = str(e)
